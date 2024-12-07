@@ -1,0 +1,1 @@
+std::iter::Map<std::iter::Filter<std::iter::Map<std::ops::Range<u32>, {closure@src/lib.rs:17:18: 17:23}>, {closure@src/lib.rs:18:21: 18:24}>, {closure@src/lib.rs:19:18: 19:21}>

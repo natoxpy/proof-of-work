@@ -1,0 +1,9 @@
+[package]
+name = "nonce-lrclib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cpu-method = { path = "./libs/cpu-method/" }
+gpu-method = { path = "./libs/gpu-method/" }
+tokio = { version = "*", features = ["full"] }

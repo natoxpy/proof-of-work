@@ -1,0 +1,12 @@
+[package]
+name = "gpu-method"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wgpu = "23.0.1"
+comptu = { path = "./libs/comptu/" }
+tokio = { version = "*" }
+data-encoding = "2.6.0"
+ring = "0.17.8"
+rayon = "1.10.0"
