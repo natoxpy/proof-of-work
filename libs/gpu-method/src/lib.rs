@@ -42,12 +42,12 @@ pub async fn test() {
 
     // let hash = doo(prefix, 67661163);
     // let offset = 67661123 + 3;
-    let workgroups = [8, 8, 8];
-    let work_per_thread = 1; // number hashes responsable for single thread
+    let workgroups = [64, 64, 64];
+    let work_per_thread = 4; // number hashes responsable for single thread
 
     let dim_len = workgroups[0] * workgroups[1] * workgroups[2] * work_per_thread;
 
-    let attemps = 1;
+    let attemps = 128;
     let time = Instant::now();
 
     let context = Arc::new(Context::new().await);
@@ -60,7 +60,8 @@ pub async fn test() {
 
     for atps in 0..attemps {
         let it = Instant::now();
-        let offset = 67661163 - 30 + atps * dim_len;
+        // let offset = 67661164 - 40 + atps * dim_len;
+        let offset = atps * dim_len;
 
         let hashes_t = Instant::now();
 
@@ -70,9 +71,11 @@ pub async fn test() {
 
         let bt = Instant::now();
         // 32 bits
-        let output_buffer = StorageBinding::new(&context, ComputeBuffer::from(vec![0; 1]), true);
-        let context_buffer =
-            StorageBinding::new(&context, ComputeBuffer::from(vec![0; dim_len]), true);
+        // let output_buffer =
+        //     StorageBinding::new(&context, ComputeBuffer::from(vec![0; dim_len / 32]), true);
+        let output_buffer = StorageBinding::new(&context, ComputeBuffer::from(vec![0; 2]), true);
+        // let context_buffer =
+        //     StorageBinding::new(&context, ComputeBuffer::from(vec![0; dim_len]), true);
 
         // [0]: hash vec<u8> length
         let metadata = StorageBinding::new(
@@ -88,7 +91,7 @@ pub async fn test() {
         let compute = ComputeContext {
             compute_module: shader.clone(),
             storage_bindings: vec![metadata, input_hash, input_target],
-            write_bindings: vec![output_buffer, context_buffer],
+            write_bindings: vec![output_buffer],
             workgroups: [
                 workgroups[0] as u32,
                 workgroups[1] as u32,
@@ -102,17 +105,24 @@ pub async fn test() {
         println!("compute {:?}", t.elapsed());
 
         println!("gpu {:?}", output.first().unwrap().data.clone());
-        let nonce = get_nonce(output.first().unwrap().data.clone(), offset as u32);
+        // let nonce = get_nonce(output.first().unwrap().data.clone(), offset as u32);
 
-        println!("nonce {:?} : {}", nonce, offset);
+        // println!("nonce {:?} : {}", nonce, offset);
         println!("loop {:?}\n", it.elapsed());
 
-        println!(
-            "context {:?}",
-            Vec::<u32>::from(output.get(1).unwrap().clone())
-        );
+        let a = Vec::<u32>::from(output.first().unwrap().clone())
+            .first()
+            .cloned()
+            .unwrap();
 
-        if nonce.is_some() {
+        println!("context {:?}", a + offset as u32);
+
+        let awa = Vec::<u32>::from(output.first().unwrap().clone())
+            .get(1)
+            .cloned()
+            .unwrap();
+
+        if awa == 1 {
             break;
         }
     }
